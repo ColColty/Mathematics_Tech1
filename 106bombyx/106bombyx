@@ -1,0 +1,74 @@
+#!/usr/bin/python3
+
+from sys import argv, exit
+
+def description():
+    print("USAGE")
+    print("    ./106bombyx n [k | i0 i1]\n")
+    print("DESCRIPTION")
+    print("    n\t    number of first generation individuals")
+    print("    k\t    growth rate from 1 to 4")
+    print("    i0\t    initial generation (included)")
+    print("    i1\t    final generation (included)")
+
+def growthRate(growthRating, firstGen):
+    counter = 1
+    while (counter <= 100):
+        print("%d %.2f" % (counter, firstGen))
+        ant_x = firstGen
+        firstGen = growthRating * ant_x * (1000 - ant_x) / 1000
+        counter += 1
+
+def InitFinGen(firstGen, initialGen, finalGen):
+    rating = 1.00
+    while (rating <= 4):
+        for i in range(2, initialGen - 1):
+            firstGen = rating * firstGen * ((1000 - firstGen) / 1000)
+        while i < finalGen - 1:
+            firstGen = rating * firstGen * ((1000 - firstGen) / 1000)
+            print("%.2f %.2f" % (rating, firstGen))
+            i+=1
+        rating += 0.01
+
+def main():
+    if (len(argv) < 2):
+        exit(84)
+    elif (len(argv) < 3) and (argv[1] != "-h"):
+        exit(84)
+    elif (len(argv) > 4):
+        exit(84)
+
+    if (argv[1] == "-h"):
+        description()
+        exit(0)
+
+    allowed = "0123456789."
+    for k in range(1, len(argv) - 1):
+        for i in argv[k]:
+            if i not in allowed:
+                exit(84)
+
+    if (argv[1] == '') or (argv[2] == ''):
+        exit(84)
+    if (int(argv[1]) <= 0):
+        exit(84)
+    if (len(argv) == 3) and (float(argv[2]) > 4) or (float(argv[2]) < 1):
+        exit(84)
+    elif (len(argv) == 3):
+        firstGen = int(argv[1])
+        growthRating = float(argv[2])
+        growthRate(growthRating, firstGen)
+    elif (len(argv) == 4):
+        if (argv[3] == ''):
+            exit(84)
+        firstGen = int(argv[1])
+        initialGen = int(argv[2])
+        finalGen = int(argv[3])
+        if (initialGen > finalGen) or (firstGen > initialGen):
+            exit(84)
+        InitFinGen(firstGen, initialGen, finalGen)
+
+# Ce if c'est dans la norme de python, c pour determiner si le fichier est executé directement ou il est linqué a un autre fichier
+# Ça peut faire partie de l'erreur handling
+if __name__ == '__main__':
+    main()

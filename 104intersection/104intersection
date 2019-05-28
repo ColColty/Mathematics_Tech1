@@ -1,0 +1,96 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2018
+## 104intersection
+## File description:
+## Paul & Tomas
+##
+
+import sys
+from math import sqrt, cos, sin
+
+def presentation():
+    print("Line passing through the point (%d, %d, %d) and parallel to the vector (%d, %d, %d)" % (int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]), int(sys.argv[6]), int(sys.argv[7])))
+
+def cone():
+    print("No intersection point.")
+
+def cylinder():
+    print("No intersection point.")
+
+def sphere():
+    x0 = int(sys.argv[2])
+    y0 = int(sys.argv[3])
+    z0 = int(sys.argv[4])
+    xv = int(sys.argv[5])
+    yv = int(sys.argv[6])
+    zv = int(sys.argv[7])
+    p = int(sys.argv[8])
+
+    print("Sphere of radius", p)
+    presentation()
+
+    a = xv**2 + yv**2 + zv**2
+    b = 2 * (x0 * xv + y0 * yv + z0 * zv)
+    c = x0**2 + y0**2 + z0**2 - p**2
+
+    delta = b**2 - 4 * a * c
+
+    if a == 0:
+        sys.exit(0)
+    if delta == 0:
+        print("1 intersection point:")
+        x = x0 + (-b / (2 * a)) * xv
+        y = y0 + (-b / (2 * a)) * yv
+        z = z0 + (-b / (2 * a)) * zv
+        print("(%.3f, %.3f, %.3f)" % (x, y, z))
+    elif delta < 0:
+        print("No intersection point.")
+    elif delta > 0:
+        print("2 intersection points:")
+        x1 = x0 + ((-b + sqrt(delta)) / (2 * a)) * xv
+        y1 = y0 + ((-b + sqrt(delta)) / (2 * a)) * yv
+        z1 = z0 + ((-b + sqrt(delta)) / (2 * a)) * zv
+        x2 = x0 + ((-b - sqrt(delta)) / (2 * a)) * xv
+        y2 = y0 + ((-b - sqrt(delta)) / (2 * a)) * yv
+        z2 = z0 + ((-b - sqrt(delta)) / (2 * a)) * zv
+        print("(%.3f, %.3f, %.3f)" % (x1, y1, z1))
+        print("(%.3f, %.3f, %.3f)" % (x2, y2, z2))
+
+def description():
+    print("USAGE")
+    print("    ./104intersection opt xp yp zp xv yv zv p\n")
+    print("DESCRIPTION")
+    print("    opt                   surface option: 1 for a sphere, 2 for a cylinder, 3 for a cone")
+    print("    (xp, yp, zp)          coordinate of a point by which the light ray passes through")
+    print("    (xv, yv, zv)          coordinate of a vector parallel to the light ray")
+    print("    p                     parameter: radius of the sphere, radius of the cylinder, or")
+    print("                          angle formed by the cone and the Z-axis")
+
+
+if len(sys.argv) == 2 and sys.argv[1] == '-h':
+    description()
+    sys.exit(0)
+
+if len(sys.argv) != 9:
+    sys.exit(84)
+
+Autorised = "0123456789.-"
+for i in range(1, len(sys.argv)):
+    for k in range(len(sys.argv[i])):
+        if sys.argv[i][k] not in Autorised:
+            sys.exit(84)
+
+number_autor = "123"
+if sys.argv[1] not in number_autor:
+    sys.exit(84)
+
+opt = int(sys.argv[1])
+
+if opt == 1:
+    sphere()
+if opt == 2:
+    cylinder()
+if opt == 3:
+    cone()

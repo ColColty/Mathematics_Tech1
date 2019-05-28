@@ -1,0 +1,70 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2018
+## 101pong
+## File description:
+## 101pong
+##
+
+import sys
+import math
+
+def description():
+    print("USAGE")
+    print("      ./101pong x0 y0 z0 x1 y1 z1 n\n")
+    print("DESCRIPTION")
+    print("      x0   ball abscissa at time t - 1")
+    print("      y0   ball ordinate at time t - 1")
+    print("      z0   ball altitude at time t - 1")
+    print("      x1   ball abscissa at time t")
+    print("      y1   ball ordinate at time t")
+    print("      z1   ball altitude at time t")
+    print("      n   time shift (greater than or equal to zero, integer)")
+
+numerical = "0123456789.-"
+
+if sys.argv[1] == "-h":
+    description()
+    sys.exit(0)
+elif len(sys.argv) != 8:
+    sys.exit(84)
+
+for i in range(1, len(sys.argv)):
+    for k in range(0, len(sys.argv[i])):
+        if sys.argv[i][k] not in numerical:
+            sys.exit(84)
+
+x0 = float (sys.argv[1])
+y0 = float (sys.argv[2])
+z0 = float (sys.argv[3])
+x1 = float (sys.argv[4])
+y1 = float (sys.argv[5])
+z1 = float (sys.argv[6])
+n = float (sys.argv[7])
+
+if n < 0:
+    sys.exit(84)
+
+vx = x1 - x0
+vy = y1 - y0
+vz = z1 - z0
+
+vtx = x1 + (vx * n)
+vty = y1 + (vy * n)
+vtz = z1 + (vz * n)
+
+print("The velocity vector of the ball is:")
+print("(%.2f, %.2f, %.2f)" % (vx, vy, vz))
+print("At time t + %d, ball coordinates will be:" % n)
+print("(%.2f, %.2f, %.2f)" % (vtx, vty, vtz))
+
+if ((x1 - vtx) + (y1 - vty) + (z1 + vtz)) == 0:
+    print("Error ! Can't divide by 0")
+    sys.exit(84)
+if (((z1 <= 0) and (vtz >= 0)) or ((z1 > 0) and (vtz <= 0))):
+    print("The incidence angle is:")
+    angle = math.degrees(math.acos(math.sqrt((x1 - vtx)**2 + (y1 - vty)**2) / math.sqrt(((x1 - vtx)**2 + (y1 - vty)**2 + (z1 - vtz)**2))))
+    print("%.2f degrees" % angle)
+else:
+    print("The ball won't reach the bat")

@@ -1,0 +1,74 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2019
+## 105torys
+## File description:
+## 105torus
+##
+
+from sys import argv, exit
+from math import *
+
+def Description():
+    print("USAGE")
+    print("    ./105torus opt a0 a1 a2 a3 a4 n\n")
+    print("DESCRIPTION")
+    print("    opt       method option:")
+    print("                  1 for the bisection method")
+    print("                  2 for Newton's method")
+    print("                  3 for the secant method")
+    print("    a[0-4]    coefficients of the equation")
+    print("    n         precision (the application of the polynomial to the solution should\n              be smaller than 10^⁻n)")
+
+def ErrorHandle():
+    if len(argv) == 2 and argv[1] == "-h":
+        Description()
+        exit(0)
+    if len(argv) != 8:
+        exit(84)
+    Authorised = "0123456789.-"
+    for i in range(1, len(argv)):
+        for k in range(len(argv[i])):
+            if argv[i][k] not in Authorised:
+                exit(84)
+    types = "123"
+    if argv[1] not in types:
+        exit(84)
+    if float(argv[7]) <= 0:
+        exit(84)
+
+def calculEquation(x):
+    global a0, a1, a2, a3, a4
+    return (x**4 * a4 + x**3 * a3 + x**2 * a2 + x * a1 + a0)
+
+def bisection(x1, x2):
+    print("bisection")
+    xNew = (x1 + x2) / 2
+    if (calculEquation(xNew) < calculEquation(x2)):
+        x1 = xNew
+    elif (calculEquation(xNew) > calculEquation(x1)):
+        x2 = xNew
+
+
+def newton():
+    print("newton")
+
+def secant():
+    print("secant")
+
+ErrorHandle()
+
+a0 = float(argv[2])
+a1 = float(argv[3])
+a2 = float(argv[4])
+a3 = float(argv[5])
+a4 = float(argv[6])
+n = int(argv[7])
+
+if int(argv[1]) == 1:
+    bisection(0, 1)
+elif int(argv[1]) == 2:
+    newton()
+elif int(argv[1]) == 3:
+    secant()

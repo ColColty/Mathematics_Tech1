@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+def Description():
+    print("USAGE")
+    print("\t./107transfer [num den]*\n")
+    print("DESCRIPTION")
+    print("\tnum\tpolynomial numerator defined by its coefficients")
+    print("\tden\tpolynomial denominator defined by its coefficients")
+
+
+def to_float(value):
+    try:
+        value = float(value)
+    except ValueError:
+        sys.exit(84)
+
+
+def ErrorHandle():
+    if (len(sys.argv) < 3) or (len(sys.argv) % 2 != 1):
+        sys.exit(84)
+
+    allowed = "1234567890.-*"
+    for i in range(1, len(sys.argv)):
+        for char in sys.argv[i]:
+            if char not in allowed:
+                sys.exit(84)
+
+    numerator = sys.argv[1].split('*')
+    denominator = sys.argv[2].split('*')
+    for i in numerator:
+        if i == '':
+            sys.exit(84)
+    for i in denominator:
+        if i == '':
+            sys.exit(84)
+
+
+def Calculating(numerator, denominator):
+    counter = 0
+    while counter < 1.001:
+        calc_num = 0
+        calc_den = 0
+        calc_ops_n = 1
+        calc_ops_d = 1
+        for ops in numerator:
+            for i, num in enumerate(ops):
+                calc_num += float(num) * math.pow(counter, i)
+                # print("numerator {} by {} -> calc {} pow {}".format(num, i, calc_num, math.pow(counter, i)))
+            calc_ops_n *= calc_num
+        for opsde in denominator:
+            for i, denum in enumerate(opsde):
+                calc_den += float(denum) * math.pow(counter, i)
+                # print("denominator {} by {} -> calc {} pow {}".format(denum, i, calc_den, math.pow(counter, i)))
+            calc_ops_d *= calc_den
+        try:
+            calc = calc_ops_n / calc_ops_d
+            print("%.3f -> %.5f" % (counter, float(calc)))
+        except ZeroDivisionError:
+            if calc_ops_n == calc_ops_d:
+                print("%.3f -> %.5f" % (counter, 0.001))
+                break
+            else:
+                sys.exit(84)
+        counter += 0.001
+
+
+def main(numerator, denominator):
+    for ops in numerator:
+        for num in ops:
+            to_float(num)
+    for opsde in denominator:
+        for denum in opsde:
+            to_float(denum)
+    Calculating(numerator, denominator)
+
+
+if __name__ == '__main__':
+    ErrorHandle()
+    numerator = []
+    denominator = []
+    for i in range(1, len(sys.argv), 2):
+        numerator.append(sys.argv[i].split('*'))
+        denominator.append(sys.argv[i + 1].split('*'))
+    main(numerator, denominator)
+    sys.exit(0)

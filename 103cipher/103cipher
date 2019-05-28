@@ -1,0 +1,62 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2018
+## 103Cipher
+## File description:
+## PRINT THE MATRICE | PAUL TARDIVEL AND TOMAS FORNE CAPPEAU
+##
+
+import sys
+import math
+
+def ASCIITransform():
+    global the_message, key
+    asciiMessage = ""
+    for letter in the_message:
+        asciiMessage += str(ord(letter))
+        asciiMessage += ' '
+    print(asciiMessage)
+
+def encrypted():
+    sys.exit(0)
+
+def decrypted():
+    sys.exit(0)
+
+def description():
+    print("USAGE")
+    print("    ./103cipher message key flag\n")
+    print("DESCRIPTION")
+    print("    message    a message, made of ASCII characters")
+    print("    key        the encryption key, made of ASCII characters")
+    print("    flag       0 for the message to be encrypted, 1 to be decrypted")
+
+if len(sys.argv) < 1 and len(sys.argv) > 3:
+    sys.exit(84)
+
+if sys.argv[1] == '-h':
+    description()
+    sys.exit(0)
+
+autorizedFlag = "01"
+
+keyMatrice = [[]]
+messageMatrice = [[]]
+
+the_message = str(sys.argv[1])
+key = str(sys.argv[2])
+flag = int(sys.argv[3])
+
+if str(flag) not in autorizedFlag:
+    sys.exit(84)
+
+ASCIITransform()
+
+if flag == 0:
+    encrypted()
+if flag == 1:
+    decrypted()
+
+
+

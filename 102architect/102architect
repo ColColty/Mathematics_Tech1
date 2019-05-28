@@ -1,0 +1,158 @@
+#!/usr/bin/python3
+
+##
+## EPITECH PROJECT, 2018
+## 102Architect
+## File description:
+## PAUL AND TOMAS
+##
+
+import sys
+import math
+
+def description():
+    print("USAGE")
+    print("   ./102architect x y transfo1 arg11 [arg12] [transfo2 arg12 [arg22]] ...\n")
+    print("DESCRIPTION")
+    print("   x      abscissa of the original point")
+    print("   y      ordinate of the original point\n")
+    print("   transfo arg1 [arg2]")
+    print("   -t i j      translation along vector (i, j)")
+    print("   -z m n      scaling by factors m (x-axis) and n (y-axis)")
+    print("   -r d        rotation centered in 0 by a d degree angle")
+    print("   -s d        reflection over the axis passing through 0 with an inclination")
+    print("               angle of d dregrees")
+
+def translation(param1, param2):
+    global x, y, matriceModifie, xModif, yModif
+    vecteur = [x, y, 1]
+    print("Translation along vector(%d, %d)" %  (float(param1), float(param2)))
+    matriceModifie[0][2] += float(param1)
+    matriceModifie[1][2] += float(param2)
+    xModif = vecteur[0] * matriceModifie[0][0] + vecteur[1] * matriceModifie[0][1] + vecteur[2] * matriceModifie[0][2]
+    yModif = vecteur[0] * matriceModifie[1][0] + vecteur[1] * matriceModifie[1][1] + vecteur[2] * matriceModifie[1][2]
+    return
+
+def scaling(param1, param2):
+    global x, y, matriceModifie, xModif, yModif
+    vecteur = [x, y, 1]
+    print("Scaling by factors %d and %d" % (float(param1), float(param2)))
+    matriceModifie[0][0] *= float(param1)
+    matriceModifie[1][1] *= float(param2)
+    xModif = vecteur[0] * matriceModifie[0][0] + vecteur[1] * matriceModifie[0][1] + vecteur[2] * matriceModifie[0][2]
+    yModif = vecteur[0] * matriceModifie[1][0] + vecteur[1] * matriceModifie[1][1] + vecteur[2] * matriceModifie[1][2]
+    return
+
+def rotation(angle):
+    global x, y, matriceModifie, xModif, yModif
+    vecteur = [x, y, 1]
+    angle_rad = float(angle) * (math.pi / 180)
+    print("Rotation by a %d degree angle" % float(angle))
+    matriceModifie[0][0] *= math.cos(angle_rad)
+    if (matriceModifie[0][1] == 0) & (matriceModifie[1][0] == 0):
+        matriceModifie[0][1] += -math.sin(angle_rad)
+        matriceModifie[1][0] += math.sin(angle_rad)
+    else:
+        matriceModifie[0][1] *= -math.sin(angle_rad)
+        matriceModifie[1][0] *= math.sin(angle_rad)
+    matriceModifie[1][1] *= math.cos(angle_rad)
+    xModif = vecteur[0] * matriceModifie[0][0] + vecteur[1] * matriceModifie[0][1] + vecteur[2] * matriceModifie[0][2]
+    yModif = vecteur[0] * matriceModifie[1][0] + vecteur[1] * matriceModifie[1][1] + vecteur[2] * matriceModifie[1][2]
+    return
+
+def reflection(angle):
+    global x, y, matriceModifie, xModif, yModif
+    vecteur = [x, y, 1]
+    angle_rad = float(angle) * (math.pi / 180)
+    print("Reflection over an axis with an inclination angle of %d degrees" % float(angle))
+    matriceModifie[0][0] *= math.cos(angle_rad * 2)
+    if (matriceModifie[0][1] == 0) & (matriceModifie[1][0] == 0):
+        matriceModifie[0][1] += math.sin(angle_rad * 2)
+        matriceModifie[1][0] += math.sin(angle_rad * 2)
+    else:
+        matriceModifie[0][1] *= math.sin(angle_rad * 2)
+        matriceModifie[1][0] *= math.sin(angle_rad * 2)
+    matriceModifie[1][1] *= -math.cos(angle_rad * 2)
+    xModif = vecteur[0] * matriceModifie[0][0] + vecteur[1] * matriceModifie[0][1] + vecteur[2] * matriceModifie[0][2]
+    yModif = vecteur[0] * matriceModifie[1][0] + vecteur[1] * matriceModifie[1][1] + vecteur[2] * matriceModifie[1][2]
+    return
+
+def showResults():
+    global x_gen, y_gen, xModif, yModif, matriceModifie
+    print("%.2f    %.2f    %.2f" % (matriceModifie[0][0], matriceModifie[0][1], matriceModifie[0][2]))
+    print("%.2f    %.2f    %.2f" % (matriceModifie[1][0], matriceModifie[1][1], matriceModifie[1][2]))
+    print("%.2f    %.2f    %.2f" % (matriceModifie[2][0], matriceModifie[2][1], matriceModifie[2][2]))
+    print("(%d, %d) => (%.2f, %.2f)" % (x_gen, y_gen, xModif, yModif))
+    return
+
+if len(sys.argv) == 1:
+    sys.exit(84)
+
+if sys.argv[1] == "-h":
+    description()
+    sys.exit(0)
+
+Autorised = "0123456789.-tzrs"
+for i in range(1, len(sys.argv)):
+    for k in range(0, len(sys.argv[i])):
+        if sys.argv[i][k] not in Autorised:
+            sys.exit(84)
+
+if sys.argv[3] == "-t" or sys.argv[3] == "-z":
+    AutorisedArgv = 6
+    StartRange = 6
+if sys.argv[3] == "-r" or sys.argv[3] == "-s":
+    AutorisedArgv = 5
+    StartRange = 5
+if sys.argv[3] != "-t" and sys.argv[3] != "-z" and sys.argv[3] != "-r" and sys.argv[3] != "-s":
+    sys.exit(84)
+
+if (len(sys.argv) > StartRange):
+    for i in range(StartRange, len(sys.argv)):
+        if (sys.argv[i] == "-t" or sys.argv[i] == "-z"):
+            AutorisedArgv += 3
+        if (sys.argv[i] == "-r" or sys.argv[i] == "-s"):
+            AutorisedArgv += 2
+
+for i in range(0,len(sys.argv)):
+    if sys.argv[i] == "-t":
+        if len(sys.argv) != AutorisedArgv:
+            sys.exit(84)
+    elif sys.argv[i] == "-z":
+        if len(sys.argv) != AutorisedArgv:
+            sys.exit(84)
+    elif sys.argv[i] == "-r":
+        if len(sys.argv) != AutorisedArgv:
+            sys.exit(84)
+    elif sys.argv[i] == "-s":
+        if len(sys.argv) != AutorisedArgv:
+            sys.exit(84)
+
+
+x_gen = float(sys.argv[1])
+y_gen = float(sys.argv[2])
+x = x_gen
+y = y_gen
+xModif = 0
+yModif = 0
+matriceModifie = [
+    [1,0,0],
+    [0,1,0],
+    [0,0,1]
+]
+
+if sys.argv[1] == "-h":
+    description()
+    sys.exit(0)
+
+for i in range(2,len(sys.argv)):
+    if sys.argv[i] == "-t":
+        translation(sys.argv[i + 1], sys.argv[i + 2])
+    elif sys.argv[i] == "-z":
+        scaling(sys.argv[i + 1], sys.argv[i + 2])
+    elif sys.argv[i] == "-r":
+        rotation(sys.argv[i + 1])
+    elif sys.argv[i] == "-s":
+        reflection(sys.argv[i + 1])
+showResults()
+

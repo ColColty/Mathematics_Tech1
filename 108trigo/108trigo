@@ -1,0 +1,199 @@
+#!/usr/bin/python3
+
+import sys
+import math
+
+FCT = ["EXP", "COS", "SIN", "COSH", "SINH"]
+PRECISION = 150
+
+def Description():
+    print("USAGE")
+    print("\t./198trigo fun a0 a1 a2 ...\n")
+    print("DESCRIPTION")
+    print("\tfun\tfunction to be applied, among at least \"EXP\", \"COS\", \"SIN\", \"COSH\"")
+    print("\t\tand \"SINH\"")
+    print("\tai\tcoeficients of the matrix")
+
+
+def ErrorHandle():
+    if len(sys.argv) < 2:
+        raise Exception("Too few arguments")
+
+    if len(sys.argv) < 3 and sys.argv[1] != "-h":
+        raise Exception("Too few arguments")
+
+    if sys.argv[1] == '-h':
+        Description()
+        sys.exit(0)
+
+    if len(sys.argv) > 2:
+        if sys.argv[1] not in FCT:
+            raise Exception("This function isn't allowed")
+
+        lenArg = len(sys.argv) - 1
+        sizeMatrix = int(math.sqrt(lenArg - 1))
+        if lenArg != pow(sizeMatrix, 2) + 1:
+            raise Exception("This is not a squared Matrix")
+
+        try: sys.argv.remove("./108trigo")
+        except: sys.argv.remove("/home/tforne/Documents/Epitech/Tek1/Semester2/Maths/108trigo_2018/108trigo")
+
+        for fct in FCT:
+            try:
+                sys.argv.remove(fct)
+                currFCT = fct
+                break
+            except:
+                pass
+
+        if sizeMatrix == 1:
+            Matrice = [[None]]
+        else:
+            Matrice = [[None for i in range(sizeMatrix)] for k in range(sizeMatrix)]
+        y = 0
+        i = 0
+        for arg in sys.argv:
+            try:
+                if (i >= sizeMatrix):
+                    y += 1
+                    i -= sizeMatrix
+                Matrice[y][i] = int(arg)
+                i += 1
+            except ValueError:
+                raise Exception("{} is not a valid input".format(arg))
+
+    return Matrice, currFCT
+
+
+def printMatrice(finalMatrice):
+    for my in finalMatrice:
+        for i, mx in enumerate(my):
+            print("%.2f" % mx, end="")
+            if i == len(finalMatrice[0]) - 1:
+                print("")
+            else:
+                print("\t", end="")
+
+
+def multiplyMatrix(baseMatrice, Matrice, sizeMatrix):
+    resultMatrix = [[0 for i in range(sizeMatrix)] for k in range(sizeMatrix)]
+
+    for j in range(sizeMatrix):
+        for i in range(sizeMatrix):
+            calc = 0
+            for k, m in enumerate(baseMatrice[j]):
+                calc += m * Matrice[k][i]
+            resultMatrix[j][i] = calc
+    return resultMatrix
+
+
+def sumMatrix(Matrix1, Matrix2):
+    sumMat = [[None for i in range(len(Matrix1[0]))] for k in range(len(Matrix1[0]))]
+
+    for y in range(len(Matrix1)):
+        for x in range(len(Matrix1[y])):
+            sumMat[y][x] = Matrix1[y][x] + Matrix2[y][x]
+
+    return sumMat
+
+
+def eachElem(Matrice, n):
+    poweredMatrice = Matrice
+
+    for i in range(n - 1):
+        poweredMatrice = multiplyMatrix(Matrice, poweredMatrice, len(poweredMatrice[0]))
+
+    denum = math.factorial(n)
+
+    for j, line in enumerate(poweredMatrice):
+        for i, nb in enumerate(line):
+             poweredMatrice[j][i] = nb / denum
+
+    return poweredMatrice
+
+
+def multiMatrixByInt(Matrice, integer):
+    resMatrix = Matrice
+
+    for j, my in enumerate(Matrice):
+        for i, mx in enumerate(my):
+            resMatrix[j][i] = mx * integer
+    return resMatrix
+
+
+def unitMatrixCreate(sizeMatrix, variable):
+    unitMatrix = [[0 for i in range(sizeMatrix)] for k in range(sizeMatrix)]
+
+    for i in range(sizeMatrix):
+        unitMatrix[i][i] = variable
+    return unitMatrix
+
+
+def calcEXP(Matrice):
+    resMatrix = unitMatrixCreate(len(Matrice[0]), 1)
+
+    for count in range(1, PRECISION):
+        resMatrix = sumMatrix(resMatrix, eachElem(Matrice, count))
+
+    printMatrice(resMatrix)
+
+
+def calcCOS(Matrice):
+    resMatrix = unitMatrixCreate(len(Matrice[0]), 1)
+
+    for count in range(1, PRECISION):
+        calcMatrix = eachElem(Matrice, count * 2)
+        calcMatrix = multiMatrixByInt(calcMatrix, pow(-1, count))
+        resMatrix = sumMatrix(resMatrix, calcMatrix)
+
+    printMatrice(resMatrix)
+
+
+def calcSIN(Matrice):
+    resMatrix = Matrice
+
+    for count in range(1, PRECISION):
+        calcMatrix = eachElem(Matrice, count * 2 + 1)
+        calcMatrix = multiMatrixByInt(calcMatrix, pow(-1, count))
+        resMatrix = sumMatrix(resMatrix, calcMatrix)
+
+    printMatrice(resMatrix)
+
+
+def calcCOSH(Matrice):
+    resMatrix = unitMatrixCreate(len(Matrice[0]), 1)
+
+    for count in range(1, PRECISION):
+        calcMatrix = eachElem(Matrice, count * 2)
+        resMatrix = sumMatrix(resMatrix, calcMatrix)
+
+    printMatrice(resMatrix)
+
+
+def calcSINH(Matrice):
+    resMatrix = Matrice
+    for count in range(1, PRECISION):
+        calcMatrix = eachElem(Matrice, count * 2 + 1)
+        resMatrix = sumMatrix(resMatrix, calcMatrix)
+
+    printMatrice(resMatrix)
+
+
+FCTDEF = {
+    "EXP": calcEXP,
+    "COS": calcCOS,
+    "SIN": calcSIN,
+    "COSH": calcCOSH,
+    "SINH": calcSINH
+}
+
+def main():
+    Matrice, fct = ErrorHandle()
+    FCTDEF[fct](Matrice)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(84)

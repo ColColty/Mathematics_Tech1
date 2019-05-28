@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+
+import sys
+import math
+import os
+import csv
+
+def Description():
+    print("USAGE")
+    print("\t./109titration file\n")
+    print("DESCRIPTION")
+    print("\tfile\ta csv file containing \"vol;ph\" line")
+
+
+def To_float(tab):
+    for i, number in enumerate(tab):
+        try:
+            tab[i] = float(number)
+        except ValueError:
+            raise Exception("Can't transform to float {}".format(number))
+    return tab
+
+
+def Unordered(tab):
+    ant_nb = tab[0]
+    for nb in tab:
+        if (ant_nb > nb):
+            return True
+        ant_nb = nb
+    return False
+
+
+def Order_it(tab1, tab2):
+    ant_nb = tab1[0]
+    tmp = 0
+    for count in tab1:
+        ant_nb = 0
+        for i, nb in enumerate(tab1):
+            if (ant_nb > nb):
+                tmp = nb
+                tab1[i] = tab1[i - 1]
+                tab1[i - 1] = tmp
+                tmp = tab2[i]
+                tab2[i] = tab2[i - 1]
+                tab2[i - 1] = tmp
+            ant_nb = nb
+    return tab1, tab2
+
+
+
+def ErrorHandle():
+    if (len(sys.argv) != 2):
+        raise Exception("Bad number of arguments")
+
+    if (sys.argv[1] == "-h"):
+        Description()
+        sys.exit(0)
+
+    filename = sys.argv[1]
+
+    if not os.path.isfile(filename):
+        raise Exception("The file doesn't exist")
+
+    vol = []
+    ph = []
+
+    allowed = "0123456789.;\n"
+    with open(filename, 'r', encoding='utf-8') as error_file:
+        data_file = error_file.read();
+        for c in data_file:
+            if c not in allowed:
+                raise Exception("The file contains bad characters")
+    with open(filename, 'r', encoding='utf-8') as file:
+        data = csv.reader(file, delimiter = ';')
+
+        for row in data:
+            if len(row) != 2:
+                raise Exception("The file contains bad number of cols")
+            vol.append(row[0])
+            ph.append(row[1])
+
+    vol = To_float(vol)
+    ph = To_float(ph)
+
+    if Unordered(vol):
+        vol, ph = Order_it(vol, ph)
+
+    return vol, ph
+
+
+def Derivative(vol, ph):
+    deriv = [[0 for i in range(len(vol) - 1)] for k in range(len(vol))]
+    maxim = 0
+    equiv = 0
+    for i in range(1, len(vol) - 1):
+        deriv[i - 1] = (ph[i + 1] - ph[i - 1]) / (vol[i + 1] - vol[i - 1])
+        print("%.1f ml -> %.2f" % (vol[i], deriv[i - 1]))
+        if (maxim < deriv[i - 1]):
+            maxim = deriv[i - 1]
+            equiv = vol[i]
+    return deriv, equiv
+
+
+def Estim_deriv(vol, ph, equiv):
+    equiv_id = vol.index(equiv) - 1
+    new_equiv = 15
+    start_val = vol[equiv_id]
+    end_val = vol[equiv_id + 2]
+    act = start_val
+    while act <= end_val:
+        if act <= equiv:
+            deriv = (((act - start_val) / (equiv - start_val)) * ph[equiv_id]) + (((equiv - act) / (equiv - start_val)) * ph[equiv_id - 1])
+        else:
+            deriv = (((act - equiv) / (end_val - equiv)) * ph[equiv_id + 1]) + (((end_val - act) / (end_val - equiv)) * ph[equiv_id])
+        print("%.1f ml -> %.2f" % (act, deriv))
+        if new_equiv > abs(deriv):
+            new_equiv = abs(deriv)
+            vol_equiv = act
+        act += 0.1
+    print("\nEquivalent point at %.1f ml" % vol_equiv)
+
+
+
+def main():
+    vol, ph = ErrorHandle()
+    print("Derivative:")
+    deriv, equiv = Derivative(vol, ph)
+    print("\nEquivalent point at %.1f ml" % equiv)
+    if (len(deriv) <= 2):
+        return
+    print("\nSecond derivative:")
+    del vol[0]
+    del vol[len(vol) - 1]
+    deriv = Derivative(vol, deriv)
+    print("\nSecond derivative estimated:")
+    Estim_deriv(vol, deriv[0], equiv)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+        sys.exit(0)
+    except Exception as e:
+        print(e)
+        sys.exit(84)
